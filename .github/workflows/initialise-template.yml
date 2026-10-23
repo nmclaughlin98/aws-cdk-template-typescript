@@ -10,11 +10,22 @@ jobs:
     if: github.repository != 'nmclaughlin98/aws-cdk-template-typescript'
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
 
     steps:
+      - name: Require initialization token
+        env:
+          INITIALIZATION_TOKEN: ${{ secrets.TEMPLATE_INIT_TOKEN }}
+        run: |
+          if [[ -z "$INITIALIZATION_TOKEN" ]]; then
+            echo "::error::Add a TEMPLATE_INIT_TOKEN secret with Contents and Workflows read/write access, then rerun this workflow."
+            exit 1
+          fi
+
       - name: Checkout Code
         uses: actions/checkout@v7
+        with:
+          token: ${{ secrets.TEMPLATE_INIT_TOKEN }}
 
       - name: Replace Project Placeholders
         env:
