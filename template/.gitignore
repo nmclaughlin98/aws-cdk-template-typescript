@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+coverage/
+/app
+
+# Build outputs
+dist/
+build/
+*.js
+!*.config.js
+*.d.ts
+*.js.map
+*.tsbuildinfo
+
+# IDE and operating system
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Environment and logs
+.env
+.env.local
+.env.*.local
+logs/
+*.log
+npm-debug.log*
+
+# AWS CDK
+cdk.out/
+cdk-out/
+cdk-outputs.json
+*.template.json
