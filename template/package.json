@@ -1,5 +1,5 @@
 {
-  "name": "TEMPLATE_REPO_NAME",
+  "name": "{--TEMPLATE_REPO_NAME--}",
   "version": "1.0.0",
   "private": true,
   "engines": {

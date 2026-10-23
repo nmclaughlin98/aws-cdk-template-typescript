@@ -18,7 +18,7 @@ jobs:
           INITIALIZATION_TOKEN: ${{ secrets.TEMPLATE_INIT_TOKEN }}
         run: |
           if [[ -z "$INITIALIZATION_TOKEN" ]]; then
-            echo "::error::Add a TEMPLATE_INIT_TOKEN secret with Contents and Workflows read/write access, then rerun this workflow."
+            echo "::error::Add a TEMPLATE_INIT_TOKEN secret with Contents, Workflows, and Pull requests read/write access, then rerun this workflow."
             exit 1
           fi
 
@@ -27,13 +27,16 @@ jobs:
         with:
           token: ${{ secrets.TEMPLATE_INIT_TOKEN }}
 
+      - name: Create Initialization Branch
+        run: git switch --create template-initialization
+
       - name: Replace Project Placeholders
         env:
           REPOSITORY_NAME: ${{ github.event.repository.name }}
           REPOSITORY_OWNER: ${{ github.repository_owner }}
         run: |
           find template -type f -exec sed -i \
-            -e "s|TEMPLATE_REPO_NAME|${REPOSITORY_NAME}|g" \
+            -e "s|{--TEMPLATE_REPO_NAME--}|${REPOSITORY_NAME}|g" \
             -e "s|TEMPLATE_OWNER|${REPOSITORY_OWNER}|g" {} +
 
       - name: Promote Project Files
@@ -43,17 +46,34 @@ jobs:
           cp -a template/.github/. .github/
           rm -rf template/.github
           rmdir template
+          git rm .github/workflows/initialise-template.yml
 
-      - name: Commit and Push Project
+      - name: Commit and Push Initialization Branch
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add -A
           git commit -m "chore: initialise repository from template"
-          git push origin HEAD:main
+          git push --force --set-upstream origin HEAD:template-initialization
 
-      - name: Self-Destruct Workflow
+      - name: Create Pull Request
+        env:
+          GH_TOKEN: ${{ secrets.TEMPLATE_INIT_TOKEN }}
+          REPOSITORY_OWNER: ${{ github.repository_owner }}
         run: |
-          git rm .github/workflows/initialise-template.yml
-          git commit -m "chore: remove template initialisation workflow"
-          git push origin HEAD:main
+          existing_pr="$(gh pr list \
+            --state open \
+            --base main \
+            --head "${REPOSITORY_OWNER}:template-initialization" \
+            --json url \
+            --jq '.[0].url // ""')"
+
+          if [[ -n "$existing_pr" ]]; then
+            echo "::notice::Initialization pull request already exists: $existing_pr"
+          else
+            gh pr create \
+              --base main \
+              --head template-initialization \
+              --title "chore: initialise repository from template" \
+              --body "Promotes the staged CDK project to the repository root, replaces template placeholders, and removes the initializer."
+          fi

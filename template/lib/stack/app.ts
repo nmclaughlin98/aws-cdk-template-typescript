@@ -3,7 +3,7 @@ import { ApplicationStack } from '../stack-configuration';
 
 const app = new cdk.App();
 
-new ApplicationStack(app, 'ApplicationStack', {
+new ApplicationStack(app, '{--TEMPLATE_REPO_NAME--}', {
   description: 'Example AWS CDK stack with a Node.js Lambda',
 });
 

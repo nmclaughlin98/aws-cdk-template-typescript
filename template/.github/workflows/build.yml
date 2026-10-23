@@ -15,6 +15,24 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v7
 
+      - name: Check for unresolved template placeholders
+        run: |
+          if git grep -n -I -F \
+            -e 'TEMPLATE_REPO_NAME' \
+            -e 'TEMPLATE_OWNER' \
+            -- . \
+            ':(exclude).github/workflows/build.yml' \
+            ':(exclude).github/workflows/initialise-template.yml'; then
+            echo "::error::Unresolved template placeholders found. Replace TEMPLATE_REPO_NAME and TEMPLATE_OWNER with project-specific values."
+            exit 1
+          else
+            grep_status=$?
+            if [[ "$grep_status" -ne 1 ]]; then
+              echo "::error::Unable to scan the repository for template placeholders."
+              exit "$grep_status"
+            fi
+          fi
+
       - name: Setup Node.js
         uses: actions/setup-node@v7
         with:

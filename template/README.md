@@ -1,8 +1,8 @@
-# TEMPLATE_REPO_NAME
+# {--TEMPLATE_REPO_NAME--}
 
 A minimal AWS CDK application written in TypeScript. It deploys one Node.js 24 Lambda function and includes unit tests for both the handler and the synthesized infrastructure.
 
-Repository: https://github.com/TEMPLATE_OWNER/TEMPLATE_REPO_NAME
+Repository: https://github.com/TEMPLATE_OWNER/{--TEMPLATE_REPO_NAME--}
 
 ## Requirements
 

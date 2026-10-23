@@ -6,15 +6,15 @@ This repository is a GitHub template for creating AWS CDK applications in TypeSc
 
 1. Select **Use this template** and create a new repository.
 2. Create a fine-grained personal access token limited to the new repository, with **Contents: Read and write** and **Workflows: Read and write** permissions. Add it to the new repository as the Actions secret `TEMPLATE_INIT_TOKEN`.
-3. Rerun the failed **Initialise Repository from Template** workflow from the Actions tab. The initial push starts the workflow, but GitHub requires the token to promote files under `.github/workflows/`.
-4. Keep the new repository's default branch named `main`.
+3. Add **Pull requests: Read and write** permission to the token. The initializer needs it to open the setup PR.
+4. Rerun the failed **Initialise Repository from Template** workflow from the Actions tab. The initial push starts the workflow, and the initializer opens a pull request against `main`.
+5. Review and merge the initialization PR. The staged project and initializer removal are both included in that PR.
+6. Keep the new repository's default branch named `main`.
 
-The workflow replaces `TEMPLATE_REPO_NAME` and `TEMPLATE_OWNER` in the staged project, promotes all files—including hidden files—from `template/` to the repository root, and removes the staging directory and this meta README. It commits the initialized project to `main`, then removes itself in a second commit.
+The workflow replaces `{--TEMPLATE_REPO_NAME--}` and `TEMPLATE_OWNER` in the staged project, promotes all files—including hidden files—from `template/` to the repository root, and removes the staging directory and this meta README. It also removes itself in the proposed changes; merging the PR completes initialization.
 
 The workflow intentionally skips this source repository: `nmclaughlin98/aws-cdk-template-typescript`.
 
 ## Staged project
 
 The complete CDK project boilerplate is in [`template/`](./template/). It includes the CDK stack, Node.js 24 Lambda handler, tests, package configuration, project documentation, and build/deploy workflows. After initialization, its own README and setup instructions are at the repository root.
-
-If the generated repository protects `main`, allow GitHub Actions to push to that branch before rerunning the initializer, or the promotion will be rejected.
